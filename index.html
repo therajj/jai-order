@@ -623,7 +623,7 @@ function getPriceValue() {
 
 // ====== Google Sheets Backend ======
 // 部署 Apps Script 後，把你的 URL 貼在這裡：
-const API_URL = 'https://script.google.com/macros/s/AKfycby4E5OXkHCN476kD_FFEF8XMggzLz8PV8eOJ73WgsCdn4Kbx_51YiDWoLsgC6KqPo6q/exec';
+const API_URL = '/api/orders';
 
 let allOrders = {};
 
@@ -651,7 +651,7 @@ async function saveToRemote(name, data) {
   try {
     await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, data }),
     });
   } catch (e) {
@@ -885,13 +885,11 @@ function getFormTotal() {
   return calcTotal();
 }
 
-async function saveOrder() {
+function saveOrder() {
   const name = document.getElementById('selName').value;
   if (!name) return;
 
   const btn = document.querySelector('.btn-save');
-  btn.textContent = '儲存中...';
-  btn.disabled = true;
 
   const data = {
     pasta: document.getElementById('selPasta').value,
@@ -910,10 +908,25 @@ async function saveOrder() {
     total: getFormTotal(),
   };
 
-  await saveToRemote(name, data);
-  btn.textContent = '儲存訂單';
-  btn.disabled = false;
+  // Update UI immediately (optimistic)
+  allOrders[name] = data;
+  localStorage.setItem('jai_orders_cache', JSON.stringify(allOrders));
+  renderSummary();
+  btn.textContent = '✓ 已儲存';
+  btn.style.background = 'var(--green-mid)';
   showToast(`${name} 的訂單已儲存`);
+
+  setTimeout(() => {
+    btn.textContent = '儲存訂單';
+    btn.style.background = '';
+  }, 2000);
+
+  // Save to remote in background (non-blocking)
+  fetch(API_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    body: JSON.stringify({ name, data }),
+  }).catch(e => console.error('Remote save failed:', e));
 }
 
 // Summary
