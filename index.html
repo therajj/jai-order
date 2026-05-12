@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAI 宅 團體訂餐</title>
+<style>
+:root {
+  --green-dark: #2d3a2e;
+  --green-mid: #4a6b4a;
+  --green-light: #d9e8d2;
+  --green-pale: #f4f8f2;
+  --cream: #faf9f6;
+  --text: #2c2c2c;
+  --text-light: #888;
+  --border: #e0e0e0;
+  --red: #c0392b;
+  --red-bg: #fdecea;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 36px 20px 28px;
+  background: var(--green-dark);
+  color: white;
+}
+
+header h1 { font-size: 2rem; font-weight: 300; letter-spacing: 4px; margin-bottom: 4px; }
+header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
+
+.container {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Menu Toggle */
+.menu-toggle {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.menu-toggle:hover { background: var(--green-pale); }
+.menu-toggle h2 { font-size: 1rem; color: var(--green-dark); }
+.menu-toggle .arrow { transition: transform 0.3s; }
+.menu-toggle.open .arrow { transform: rotate(180deg); }
+
+.menu-panel {
+  display: none;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  margin-top: -12px;
+  box-shadow: var(--shadow);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.menu-panel.show { display: block; }
+
+.summary-panel {
+  display: none;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  margin-top: -12px;
+  box-shadow: var(--shadow);
+}
+
+.summary-panel.show { display: block; }
+
+.menu-category { margin-bottom: 16px; }
+.menu-category h3 {
+  font-size: 0.82rem;
+  color: var(--green-mid);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--green-light);
+}
+
+.menu-category ul { list-style: none; }
+.menu-category li {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.84rem;
+}
+.menu-category li .price { color: var(--green-mid); font-weight: 500; }
+
+/* Order Form */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--green-light);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.92rem;
+  background: white;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(74,107,74,0.12);
+}
+
+.form-group input[type="number"] { width: 140px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.clam-btn {
+  margin-top: 8px;
+  padding: 8px 14px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-light);
+  width: 100%;
+}
+
+.clam-btn:hover { border-color: var(--green-mid); }
+
+.clam-btn.active {
+  background: var(--green-dark);
+  color: white;
+  border-color: var(--green-dark);
+}
+
+.combo-rules {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--green-pale);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--text-light);
+  line-height: 1.7;
+  display: none;
+}
+
+.combo-rules.show { display: block; }
+.combo-rules strong { color: var(--green-dark); }
+
+.subtotal-display {
+  text-align: right;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  padding: 12px 0;
+  border-top: 2px solid var(--green-light);
+  margin-top: 8px;
+}
+
+.btn-save {
+  width: 100%;
+  padding: 14px;
+  background: var(--green-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 12px;
+}
+
+.btn-save:hover { background: var(--green-mid); }
+
+/* Team Summary */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.summary-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--green-pale);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.summary-item .name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.summary-item .status {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--green-mid);
+}
+
+.summary-item.over-budget {
+  background: var(--red-bg);
+}
+
+.summary-item.over-budget .name {
+  color: var(--red);
+}
+
+.summary-item.over-budget .status {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.summary-item.empty {
+  background: #f5f5f5;
+}
+
+.summary-item.empty .status {
+  color: var(--text-light);
+}
+
+.budget-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  text-align: right;
+  margin-bottom: 12px;
+}
+
+.grand-total {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--green-dark);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text);
+}
+
+.btn-action:hover { background: var(--green-pale); border-color: var(--green-mid); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--green-dark);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* Saved indicator */
+.saved-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  background: var(--green-light);
+  color: var(--green-mid);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+  .container { padding: 16px 12px; }
+  .form-row { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .card { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>JAI 宅</h1>
+  <p>PASTA &middot; RISOTTO &middot; TEAM ORDER</p>
+</header>
+
+<div class="container">
+
+  <!-- Menu Reference -->
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <h2>完整菜單</h2>
+    <span class="arrow">&#9662;</span>
+  </div>
+  <div class="menu-panel" id="menuPanel"></div>
+
+  <!-- Team Summary -->
+  <div class="menu-toggle" onclick="toggleSummary()">
+    <h2>團隊訂餐總覽</h2>
+    <span class="arrow" id="summaryArrow">&#9662;</span>
+  </div>
+  <div class="summary-panel" id="summaryPanel">
+    <p class="budget-label">預算上限：$650 / 人</p>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div class="grand-total" id="grandTotal"></div>
+    <div class="actions">
+      <button class="btn-action" onclick="exportText()">複製訂單文字</button>
+      <button class="btn-action" onclick="exportCSV()">下載 CSV</button>
+    </div>
+  </div>
+
+  <!-- Order Form -->
+  <div class="card">
+    <h2 class="card-title">點餐</h2>
+
+    <div class="form-group">
+      <label>姓名</label>
+      <select id="selName" onchange="loadOrder()">
+        <option value="">-- 選擇你的名字 --</option>
+      </select>
+    </div>
+
+    <div id="orderForm" style="display:none;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>麵體</label>
+          <select id="selPasta" onchange="updateSauce();updateIngredients();lookupPrice();calc()">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>醬料</label>
+          <select id="selSauce" onchange="updateIngredients();lookupPrice();calc()">
+            <option value="">--</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>主食材</label>
+          <select id="selIngredient" onchange="updateClamUpgrade();lookupPrice();calc()">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>主餐價格</label>
+          <input type="text" id="inpPrice" placeholder="自動帶入" readonly style="background:#f5f5f5;color:var(--green-dark);font-weight:600;">
+          <button type="button" id="btnClam" class="clam-btn" style="display:none;" onclick="toggleClam()">🦪 蛤蜊增量 +$60</button>
+          <input type="hidden" id="chkClam" value="false">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>套餐</label>
+        <select id="selCombo" onchange="showComboRules();calc()">
+          <option value="">-- 不加套餐 --</option>
+        </select>
+        <div class="combo-rules" id="comboRules"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>加購</label>
+          <select id="selAddon" onchange="calc()">
+            <option value="">-- 不加購 --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>免費加量</label>
+          <select id="selExtra">
+            <option value="">-- 不加 --</option>
+            <option value="加麵">加麵</option>
+            <option value="加飯">加飯</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>小物</label>
+        <select id="selSides" onchange="calc()">
+          <option value="">--</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>飲品</label>
+          <select id="selDrinks" onchange="updateIceHot();calc()">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>冰/熱</label>
+          <select id="selTemp" disabled>
+            <option value="">--</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>甜點</label>
+          <select id="selDessert" onchange="calc()">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>備註</label>
+          <input type="text" id="inpNote" placeholder="壽星 / 其他" list="noteList">
+        </div>
+      </div>
+
+      <div class="subtotal-display">小計：<span id="subtotal">$0</span></div>
+      <button class="btn-save" onclick="saveOrder()">儲存訂單</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<datalist id="noteList"><option value="壽星"></datalist>
+
+<script>
+const NAMES = ['Andy','Barry','Ben','Benji','Darren','Donna','Eric','Thera','Jim','Jimmy','John','Larry','Max','Michael','Michelle','Penny','Ray','Roy','Stanley','Gene','Vic','Wilson','Yong Shin'];
+const BUDGET = 650;
+
+const SAUCE_MAP = {
+  '圓麵': ['橘醬','松露奶油','🌶️蒜香辣味','法式白酒'],
+  '扁麵': ['Cheese奶油','🌶️麻辣奶油','墨西哥奶油莎莎'],
+  '筆管麵': ['橘醬','松露奶油','Cheese奶油','墨西哥奶油莎莎','🌶️麻辣奶油'],
+  '燉飯': ['橘醬','佩里斯白醬','松露奶油','墨西哥奶油莎莎','Cheese奶油'],
+};
+
+const INGREDIENT_MAP = {
+  '圓麵|橘醬': ['紐奧良雞腿','爆炸蛤蜊','主廚烤雞腿','炸蝦','松阪豬'],
+  '圓麵|松露奶油': ['爆炸蛤蜊','松阪豬'],
+  '圓麵|🌶️蒜香辣味': ['🌶️蒜香辣味蛤蜊','🌶️蒜香辣味鮮蝦'],
+  '圓麵|法式白酒': ['爆炸蛤蜊'],
+  '扁麵|Cheese奶油': ['紐奧良雞腿','爆炸蛤蜊','主廚烤雞腿','炸蝦','松阪豬'],
+  '扁麵|🌶️麻辣奶油': ['紐奧良雞腿','爆炸蛤蜊','主廚烤雞腿','炸蝦','松阪豬'],
+  '扁麵|墨西哥奶油莎莎': ['爆炸蛤蜊','主廚烤雞腿','炸蝦','松阪豬'],
+  '筆管麵|橘醬': ['紐奧良雞腿','爆炸蛤蜊','炸蝦'],
+  '筆管麵|松露奶油': ['爆炸蛤蜊','主廚烤雞腿','炸蝦'],
+  '筆管麵|Cheese奶油': ['爆炸蛤蜊','松阪豬'],
+  '筆管麵|墨西哥奶油莎莎': ['紐奧良雞腿','爆炸蛤蜊','松阪豬'],
+  '筆管麵|🌶️麻辣奶油': ['紐奧良雞腿','爆炸蛤蜊','炸蝦','松阪豬'],
+  '燉飯|橘醬': ['爆炸蛤蜊','主廚烤雞腿'],
+  '燉飯|佩里斯白醬': ['爆炸蛤蜊','主廚烤雞腿','炸蝦'],
+  '燉飯|松露奶油': ['爆炸蛤蜊','主廚烤雞腿','炸蝦'],
+  '燉飯|墨西哥奶油莎莎': ['紐奧良雞腿','主廚烤雞腿','炸蝦'],
+  '燉飯|Cheese奶油': ['紐奧良雞腿','主廚烤雞腿','松阪豬'],
+};
+const COMBOS = ['A-主廚麵包+濃湯 $159','B-飲品+濃湯 $220','C-飲品+小物或甜點 $255'];
+const ADDONS = ['溫泉蛋 $25','加焗烤 $60','焗烤加量 $99','主廚麵包(B/C套餐) $69'];
+const SIDES = ['主廚手作麵包 $79','季節濃湯 $150','JAI現炸薯條 $165','松露薯條 $220','🌶️青花椒脆皮炸雞 $230','法式蜂蜜芥末炸雞 $230','日式焦糖檸檬炸雞 $240','BBQ優酪炸玉米 $170','碳烤玉米佐檸檬優格 $190'];
+const DRINKS = ['經典美式 $110','香橙美式 $120','原味拿鐵 $130','咖啡紅茶牛奶冰磚 $130','蜜香貴妃烏龍茶 $99','台茶12金萱烏龍茶 $99','台茶18紅玉紅茶 $99','接骨木蘋果金萱茶磚 $115','覆盆無花果金萱茶磚 $115','水蜜桃紅茶 $125','經典臺灣奶茶 $125','英式伯爵奶茶 $130','台茶18鮮鑽水果茶 $130','蜜香貴妃烏龍牛奶冰磚 $130','台茶18紅玉紅茶牛奶冰磚 $130','英式伯爵茶牛奶冰磚 $150'];
+const DRINKS_ICED = ['經典美式','原味拿鐵','蜜香貴妃烏龍茶','台茶12金萱烏龍茶','台茶18紅玉紅茶','經典臺灣奶茶','英式伯爵奶茶','蜜香貴妃烏龍牛奶冰磚','台茶18紅玉紅茶牛奶冰磚','英式伯爵茶牛奶冰磚'];
+const DESSERTS = ['氮氣優格泡泡布丁 $120','瀑布原味提拉米蘇(含酒精) $260'];
+
+const MENU_DATA = [
+  {cat:'圓麵-橘醬',items:[['紐奧良雞腿',285],['爆炸蛤蜊',299],['主廚烤雞腿',350],['炸蝦',350],['松阪豬',360]]},
+  {cat:'圓麵-松露奶油',items:[['爆炸蛤蜊',340],['松阪豬',390]]},
+  {cat:'圓麵-🌶️蒜香辣味/法式白酒',items:[['🌶️蒜香辣味蛤蜊',290],['法式白酒蛤蜊',299],['🌶️蒜香辣味鮮蝦',310]]},
+  {cat:'扁麵-Cheese奶油',items:[['紐奧良雞腿',300],['爆炸蛤蜊',310],['炸蝦',355],['主廚烤雞腿',365],['松阪豬',365]]},
+  {cat:'扁麵-🌶️麻辣奶油',items:[['紐奧良雞腿',285],['爆炸蛤蜊',299],['主廚烤雞腿',350],['炸蝦',350],['松阪豬',360]]},
+  {cat:'扁麵-墨西哥奶油莎莎',items:[['爆炸蛤蜊',299],['主廚烤雞腿',350],['炸蝦',350],['松阪豬',360]]},
+  {cat:'筆管麵-橘醬',items:[['紐奧良雞腿',285],['爆炸蛤蜊',299],['炸蝦',350]]},
+  {cat:'筆管麵-松露奶油',items:[['爆炸蛤蜊',340],['主廚烤雞腿',385],['炸蝦',385]]},
+  {cat:'筆管麵-Cheese奶油',items:[['爆炸蛤蜊',310],['松阪豬',365]]},
+  {cat:'筆管麵-墨西哥奶油莎莎',items:[['紐奧良雞腿',285],['爆炸蛤蜊',299],['松阪豬',360]]},
+  {cat:'筆管麵-🌶️麻辣奶油',items:[['紐奧良雞腿',285],['爆炸蛤蜊',299],['炸蝦',350],['松阪豬',360]]},
+  {cat:'燉飯-橘醬',items:[['爆炸蛤蜊',299],['主廚烤雞腿',350]]},
+  {cat:'燉飯-佩里斯白醬',items:[['爆炸蛤蜊',299],['主廚烤雞腿',350],['炸蝦',350]]},
+  {cat:'燉飯-松露奶油',items:[['爆炸蛤蜊',340],['主廚烤雞腿',385],['炸蝦',385]]},
+  {cat:'燉飯-墨西哥奶油莎莎',items:[['紐奧良雞腿',385],['主廚烤雞腿',350],['炸蝦',350]]},
+  {cat:'燉飯-Cheese奶油',items:[['紐奧良雞腿',300],['主廚烤雞腿',365],['松阪豬',365]]},
+  {cat:'小物',items:[['主廚手作麵包',79],['季節濃湯',150],['JAI現炸薯條',165],['松露薯條',220],['🌶️青花椒脆皮炸雞',230],['法式蜂蜜芥末炸雞',230],['日式焦糖檸檬炸雞',240]]},
+  {cat:'單品',items:[['BBQ優酪炸玉米',170],['碳烤玉米佐檸檬優格',190]]},
+  {cat:'甜點',items:[['氮氣優格泡泡布丁',120],['瀑布原味提拉米蘇(含酒精)',260]]},
+  {cat:'咖啡',items:[['經典美式 I/H',110],['香橙美式',120],['原味拿鐵 I/H',130],['咖啡紅茶牛奶冰磚',130]]},
+  {cat:'飲品',items:[['蜜香貴妃烏龍茶 I/H',99],['台茶12金萱烏龍茶 I/H',99],['台茶18紅玉紅茶 I/H',99],['接骨木蘋果金萱茶磚',115],['覆盆無花果金萱茶磚',115],['水蜜桃紅茶',125],['經典臺灣奶茶 I/H',125],['英式伯爵奶茶 I/H',130],['台茶18鮮鑽水果茶',130],['蜜香貴妃烏龍牛奶冰磚 I/H',130],['台茶18紅玉紅茶牛奶冰磚 I/H',130],['英式伯爵茶牛奶冰磚 I/H',150]]},
+];
+
+// Price lookup: key = "麵體|醬料|主食材" → price
+const PRICE_MAP = {};
+(function buildPriceMap() {
+  const data = [
+    ['圓麵','橘醬','紐奧良雞腿',285],['圓麵','橘醬','爆炸蛤蜊',299],['圓麵','橘醬','主廚烤雞腿',350],['圓麵','橘醬','炸蝦',350],['圓麵','橘醬','松阪豬',360],
+    ['圓麵','松露奶油','爆炸蛤蜊',340],['圓麵','松露奶油','松阪豬',390],
+    ['圓麵','🌶️蒜香辣味','🌶️蒜香辣味蛤蜊',290],['圓麵','法式白酒','爆炸蛤蜊',299],['圓麵','🌶️蒜香辣味','🌶️蒜香辣味鮮蝦',310],
+    ['扁麵','Cheese奶油','紐奧良雞腿',300],['扁麵','Cheese奶油','爆炸蛤蜊',310],['扁麵','Cheese奶油','炸蝦',355],['扁麵','Cheese奶油','主廚烤雞腿',365],['扁麵','Cheese奶油','松阪豬',365],
+    ['扁麵','🌶️麻辣奶油','紐奧良雞腿',285],['扁麵','🌶️麻辣奶油','爆炸蛤蜊',299],['扁麵','🌶️麻辣奶油','主廚烤雞腿',350],['扁麵','🌶️麻辣奶油','炸蝦',350],['扁麵','🌶️麻辣奶油','松阪豬',360],
+    ['扁麵','墨西哥奶油莎莎','爆炸蛤蜊',299],['扁麵','墨西哥奶油莎莎','主廚烤雞腿',350],['扁麵','墨西哥奶油莎莎','炸蝦',350],['扁麵','墨西哥奶油莎莎','松阪豬',360],
+    ['筆管麵','橘醬','紐奧良雞腿',285],['筆管麵','橘醬','爆炸蛤蜊',299],['筆管麵','橘醬','炸蝦',350],
+    ['筆管麵','松露奶油','爆炸蛤蜊',340],['筆管麵','松露奶油','主廚烤雞腿',385],['筆管麵','松露奶油','炸蝦',385],
+    ['筆管麵','Cheese奶油','爆炸蛤蜊',310],['筆管麵','Cheese奶油','松阪豬',365],
+    ['筆管麵','墨西哥奶油莎莎','紐奧良雞腿',285],['筆管麵','墨西哥奶油莎莎','爆炸蛤蜊',299],['筆管麵','墨西哥奶油莎莎','松阪豬',360],
+    ['筆管麵','🌶️麻辣奶油','紐奧良雞腿',285],['筆管麵','🌶️麻辣奶油','爆炸蛤蜊',299],['筆管麵','🌶️麻辣奶油','炸蝦',350],['筆管麵','🌶️麻辣奶油','松阪豬',360],
+    ['燉飯','橘醬','爆炸蛤蜊',299],['燉飯','橘醬','主廚烤雞腿',350],
+    ['燉飯','佩里斯白醬','爆炸蛤蜊',299],['燉飯','佩里斯白醬','主廚烤雞腿',350],['燉飯','佩里斯白醬','炸蝦',350],
+    ['燉飯','松露奶油','爆炸蛤蜊',340],['燉飯','松露奶油','主廚烤雞腿',385],['燉飯','松露奶油','炸蝦',385],
+    ['燉飯','墨西哥奶油莎莎','紐奧良雞腿',385],['燉飯','墨西哥奶油莎莎','主廚烤雞腿',350],['燉飯','墨西哥奶油莎莎','炸蝦',350],
+    ['燉飯','Cheese奶油','紐奧良雞腿',300],['燉飯','Cheese奶油','主廚烤雞腿',365],['燉飯','Cheese奶油','松阪豬',365],
+  ];
+  data.forEach(([pasta,sauce,ing,price]) => {
+    PRICE_MAP[`${pasta}|${sauce}|${ing}`] = price;
+  });
+})();
+
+function lookupPrice() {
+  const pasta = document.getElementById('selPasta').value;
+  const sauce = document.getElementById('selSauce').value;
+  const ingredient = document.getElementById('selIngredient').value;
+  const inp = document.getElementById('inpPrice');
+  if (pasta && sauce && ingredient) {
+    const key = `${pasta}|${sauce}|${ingredient}`;
+    const price = PRICE_MAP[key];
+    inp.value = price ? `$${price}` : '';
+  } else {
+    inp.value = '';
+  }
+}
+
+function getPriceValue() {
+  const val = document.getElementById('inpPrice').value;
+  const m = val.match(/\$?(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+// ====== Google Sheets Backend ======
+// 部署 Apps Script 後，把你的 URL 貼在這裡：
+const API_URL = 'https://script.google.com/macros/s/AKfycby4E5OXkHCN476kD_FFEF8XMggzLz8PV8eOJ73WgsCdn4Kbx_51YiDWoLsgC6KqPo6q/exec';
+
+let allOrders = {};
+
+async function fetchOrders() {
+  try {
+    const res = await fetch(API_URL);
+    const json = await res.json();
+    allOrders = json.orders || {};
+    localStorage.setItem('jai_orders_cache', JSON.stringify(allOrders));
+  } catch (e) {
+    const cache = localStorage.getItem('jai_orders_cache');
+    if (cache) allOrders = JSON.parse(cache);
+  }
+  renderSummary();
+}
+
+function getOrders() {
+  return allOrders;
+}
+
+async function saveToRemote(name, data) {
+  allOrders[name] = data;
+  localStorage.setItem('jai_orders_cache', JSON.stringify(allOrders));
+  renderSummary();
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ name, data }),
+    });
+  } catch (e) {
+    console.error('Save failed:', e);
+  }
+}
+
+// Init
+async function init() {
+  buildMenuPanel();
+  populateSelects();
+  await fetchOrders();
+}
+
+function populateSelects() {
+  const sel = document.getElementById('selName');
+  NAMES.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = n;
+    sel.appendChild(opt);
+  });
+
+  populateOptions('selPasta', Object.keys(SAUCE_MAP));
+  populateOptions('selCombo', COMBOS);
+  populateOptions('selAddon', ADDONS);
+  populateOptions('selSides', SIDES);
+  populateOptions('selDrinks', DRINKS);
+  populateOptions('selDessert', DESSERTS);
+}
+
+function populateOptions(id, items) {
+  const sel = document.getElementById(id);
+  items.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item;
+    opt.textContent = item;
+    sel.appendChild(opt);
+  });
+}
+
+function buildMenuPanel() {
+  const panel = document.getElementById('menuPanel');
+  let html = '';
+  MENU_DATA.forEach(group => {
+    html += `<div class="menu-category"><h3>${group.cat}</h3><ul>`;
+    group.items.forEach(([name, price]) => {
+      html += `<li><span>${name}</span><span class="price">$${price}</span></li>`;
+    });
+    html += '</ul></div>';
+  });
+  panel.innerHTML = html;
+}
+
+function toggleMenu() {
+  document.getElementById('menuPanel').classList.toggle('show');
+  document.querySelectorAll('.menu-toggle')[0].classList.toggle('open');
+}
+
+function toggleSummary() {
+  document.getElementById('summaryPanel').classList.toggle('show');
+  document.querySelectorAll('.menu-toggle')[1].classList.toggle('open');
+}
+
+
+// Form Logic
+function loadOrder() {
+  const name = document.getElementById('selName').value;
+  const form = document.getElementById('orderForm');
+  if (!name) { form.style.display = 'none'; return; }
+  form.style.display = 'block';
+
+  const data = allOrders[name] || {};
+
+  document.getElementById('selPasta').value = data.pasta || '';
+  updateSauce();
+  document.getElementById('selSauce').value = data.sauce || '';
+  updateIngredients();
+  document.getElementById('selIngredient').value = data.ingredient || '';
+  updateClamUpgrade();
+  if (data.clamExtra) {
+    document.getElementById('chkClam').value = 'true';
+    document.getElementById('btnClam').classList.add('active');
+  } else {
+    document.getElementById('chkClam').value = 'false';
+    document.getElementById('btnClam').classList.remove('active');
+  }
+  lookupPrice();
+  document.getElementById('selCombo').value = data.combo || '';
+  showComboRules();
+  document.getElementById('selAddon').value = data.addon || '';
+  document.getElementById('selExtra').value = data.extra || '';
+  document.getElementById('selSides').value = data.sides || '';
+  document.getElementById('selDrinks').value = data.drinks || '';
+  updateIceHot();
+  document.getElementById('selTemp').value = data.temp || '';
+  document.getElementById('selDessert').value = data.dessert || '';
+  document.getElementById('inpNote').value = data.note || '';
+  calc();
+}
+
+function updateSauce() {
+  const pasta = document.getElementById('selPasta').value;
+  const sel = document.getElementById('selSauce');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">--</option>';
+  if (pasta && SAUCE_MAP[pasta]) {
+    SAUCE_MAP[pasta].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      sel.appendChild(opt);
+    });
+  }
+  sel.value = current;
+}
+
+function updateIngredients() {
+  const pasta = document.getElementById('selPasta').value;
+  const sauce = document.getElementById('selSauce').value;
+  const sel = document.getElementById('selIngredient');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">--</option>';
+  if (pasta && sauce) {
+    const key = `${pasta}|${sauce}`;
+    const items = INGREDIENT_MAP[key] || [];
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      sel.appendChild(opt);
+    });
+  }
+  if ([...sel.options].some(o => o.value === current)) {
+    sel.value = current;
+  } else {
+    sel.value = '';
+  }
+}
+
+function extractPrice(str) {
+  if (!str) return 0;
+  const m = str.match(/\$(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+function updateClamUpgrade() {
+  const ingredient = document.getElementById('selIngredient').value;
+  const btn = document.getElementById('btnClam');
+  if (ingredient === '爆炸蛤蜊') {
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+    btn.classList.remove('active');
+    document.getElementById('chkClam').value = 'false';
+  }
+}
+
+function toggleClam() {
+  const btn = document.getElementById('btnClam');
+  const input = document.getElementById('chkClam');
+  btn.classList.toggle('active');
+  input.value = btn.classList.contains('active') ? 'true' : 'false';
+  calc();
+}
+
+function updateIceHot() {
+  const drinkVal = document.getElementById('selDrinks').value;
+  const sel = document.getElementById('selTemp');
+  const drinkName = drinkVal.split(' $')[0];
+  if (drinkVal && DRINKS_ICED.includes(drinkName)) {
+    sel.disabled = false;
+    sel.innerHTML = '<option value="冰">冰</option><option value="熱">熱</option>';
+  } else {
+    sel.disabled = true;
+    sel.innerHTML = '<option value="">--</option>';
+  }
+}
+
+function showComboRules() {
+  const comboVal = document.getElementById('selCombo').value;
+  const el = document.getElementById('comboRules');
+  if (!comboVal) { el.classList.remove('show'); return; }
+  el.classList.add('show');
+  if (comboVal.startsWith('A')) {
+    el.innerHTML = '<strong>A 套餐</strong>：含主廚手作麵包 + 季節濃湯';
+  } else if (comboVal.startsWith('B')) {
+    el.innerHTML = '<strong>B 套餐</strong>：含季節濃湯 + 飲品折抵 <strong>$140</strong>（超過補差額）';
+  } else if (comboVal.startsWith('C')) {
+    el.innerHTML = '<strong>C 套餐</strong>：含飲品折抵 <strong>$140</strong> + 小物或甜點折抵 <strong>$170</strong>（超過補差額）';
+  }
+}
+
+function calcTotal() {
+  const price = getPriceValue();
+  const comboVal = document.getElementById('selCombo').value;
+  const combo = extractPrice(comboVal);
+  const addon = extractPrice(document.getElementById('selAddon').value);
+  const clamExtra = document.getElementById('chkClam').value === 'true' ? 60 : 0;
+  const sides = extractPrice(document.getElementById('selSides').value);
+  const drinks = extractPrice(document.getElementById('selDrinks').value);
+  const dessert = extractPrice(document.getElementById('selDessert').value);
+
+  let drinkDeduct = 0;
+  let sideDeduct = 0;
+
+  if (comboVal.startsWith('B')) {
+    // B套餐含飲品(折抵up to $140) + 季節濃湯
+    if (drinks > 0) drinkDeduct = Math.min(drinks, 140);
+  } else if (comboVal.startsWith('C')) {
+    // C套餐含飲品(折抵up to $140) + 小物或甜點(折抵up to $170)
+    if (drinks > 0) drinkDeduct = Math.min(drinks, 140);
+    if (sides > 0) {
+      sideDeduct = Math.min(sides, 170);
+    } else if (dessert > 0) {
+      sideDeduct = Math.min(dessert, 170);
+    }
+  }
+
+  return price + combo + addon + clamExtra + sides + drinks + dessert - drinkDeduct - sideDeduct;
+}
+
+function calc() {
+  const total = calcTotal();
+  document.getElementById('subtotal').textContent = `$${total}`;
+}
+
+function getFormTotal() {
+  return calcTotal();
+}
+
+async function saveOrder() {
+  const name = document.getElementById('selName').value;
+  if (!name) return;
+
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '儲存中...';
+  btn.disabled = true;
+
+  const data = {
+    pasta: document.getElementById('selPasta').value,
+    sauce: document.getElementById('selSauce').value,
+    ingredient: document.getElementById('selIngredient').value,
+    price: getPriceValue(),
+    clamExtra: document.getElementById('chkClam').value === 'true',
+    combo: document.getElementById('selCombo').value,
+    addon: document.getElementById('selAddon').value,
+    extra: document.getElementById('selExtra').value,
+    sides: document.getElementById('selSides').value,
+    drinks: document.getElementById('selDrinks').value,
+    temp: document.getElementById('selTemp').value,
+    dessert: document.getElementById('selDessert').value,
+    note: document.getElementById('inpNote').value,
+    total: getFormTotal(),
+  };
+
+  await saveToRemote(name, data);
+  btn.textContent = '儲存訂單';
+  btn.disabled = false;
+  showToast(`${name} 的訂單已儲存`);
+}
+
+// Summary
+function renderSummary() {
+  const grid = document.getElementById('summaryGrid');
+  const orders = getOrders();
+  let html = '';
+
+  NAMES.forEach(name => {
+    const data = orders[name];
+    const total = data ? (data.total || 0) : 0;
+
+    if (!data || total === 0) {
+      html += `<div class="summary-item empty">
+        <span class="name">${name}</span>
+        <span class="status">未點餐</span>
+      </div>`;
+    } else if (total > BUDGET) {
+      html += `<div class="summary-item over-budget">
+        <span class="name">${name}</span>
+        <span class="status">🔴</span>
+      </div>`;
+    } else {
+      const remaining = BUDGET - total;
+      html += `<div class="summary-item">
+        <span class="name">${name}</span>
+        <span class="status">剩餘 $${remaining}</span>
+      </div>`;
+    }
+  });
+
+  grid.innerHTML = html;
+
+  // Grand total
+  let grandTotal = 0;
+  let orderCount = 0;
+  NAMES.forEach(name => {
+    const data = allOrders[name];
+    if (data && data.total > 0) {
+      grandTotal += data.total;
+      orderCount++;
+    }
+  });
+  const gtEl = document.getElementById('grandTotal');
+  if (orderCount > 0) {
+    gtEl.innerHTML = `<span>合計（${orderCount} 人已點）</span><span>$${grandTotal}</span>`;
+    gtEl.style.display = 'flex';
+  } else {
+    gtEl.style.display = 'none';
+  }
+}
+
+// Export
+function exportText() {
+  let lines = ['JAI 宅 團體訂餐\n'];
+  let grandTotal = 0;
+
+  NAMES.forEach(name => {
+    const d = allOrders[name];
+    if (!d || !d.total) return;
+    let parts = [`${name}:`];
+    if (d.pasta) parts.push(`${d.pasta}/${d.sauce}/${d.ingredient}`);
+    if (d.price) parts.push(`$${d.price}`);
+    if (d.combo) parts.push(`套餐${d.combo.split('-')[0]}`);
+    if (d.addon) parts.push(`+${d.addon.split(' $')[0]}`);
+    if (d.extra) parts.push(`(${d.extra})`);
+    if (d.sides) parts.push(d.sides.split(' $')[0]);
+    if (d.drinks) parts.push(d.drinks.split(' $')[0] + (d.temp ? `(${d.temp})` : ''));
+    if (d.dessert) parts.push(d.dessert.split(' $')[0]);
+    if (d.note) parts.push(`(${d.note})`);
+    parts.push(`= $${d.total}`);
+    lines.push(parts.join(' '));
+    grandTotal += d.total;
+  });
+
+  lines.push(`\n合計: $${grandTotal}`);
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('已複製到剪貼簿'));
+}
+
+function exportCSV() {
+  let csv = '﻿姓名,麵體,醬料,主食材,主餐價格,套餐,加購,小物,飲品,甜點,小計,備註\n';
+  NAMES.forEach(name => {
+    const d = allOrders[name] || {};
+    const fields = [name, d.pasta||'', d.sauce||'', d.ingredient||'', d.price||'', d.combo||'', d.addon||'', d.sides||'', d.drinks||'', d.dessert||'', d.total||'', d.note||''];
+    csv += fields.map(f => `"${f}"`).join(',') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'JAI宅_訂餐.csv';
+  a.click();
+  showToast('CSV 已下載');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
