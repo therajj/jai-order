@@ -501,7 +501,10 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
         </div>
       </div>
 
-      <div class="subtotal-display">小計：<span id="subtotal">$0</span></div>
+      <div class="subtotal-display">
+        <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px;">含 10% 服務費</div>
+        <div>小計：<span id="subtotal">$0</span></div>
+      </div>
       <button class="btn-save" onclick="saveOrder()">儲存訂單</button>
     </div>
   </div>
@@ -868,7 +871,9 @@ function calcTotal() {
     }
   }
 
-  return price + combo + addon + clamExtra + sides + drinks + dessert - drinkDeduct - sideDeduct;
+  const subtotal = price + combo + addon + clamExtra + sides + drinks + dessert - drinkDeduct - sideDeduct;
+  const serviceCharge = Math.round(subtotal * 0.1);
+  return subtotal + serviceCharge;
 }
 
 function calc() {
