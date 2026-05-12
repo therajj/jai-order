@@ -395,6 +395,56 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+.mascot {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: none;
+  cursor: pointer;
+  z-index: 998;
+  animation: bounce 0.5s ease;
+}
+
+.mascot.show { display: block; }
+
+.mascot img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.mascot-bubble {
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  background: var(--red);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.mascot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 20px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--red);
+}
+
+@keyframes bounce {
+  0% { transform: scale(0) translateY(20px); }
+  60% { transform: scale(1.1) translateY(-5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
 /* Saved indicator */
 .saved-badge {
   display: inline-block;
@@ -564,6 +614,11 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="mascot" id="mascot" onclick="hideMascot()">
+  <div class="mascot-bubble">超出預算囉！</div>
+  <img src="mascot.jpg" alt="mascot">
+</div>
 <datalist id="noteList"><option value="壽星"></datalist>
 
 <script>
@@ -954,6 +1009,16 @@ function calcTotal() {
 function calc() {
   const total = calcTotal();
   document.getElementById('subtotal').textContent = `$${total}`;
+  const mascot = document.getElementById('mascot');
+  if (total > BUDGET) {
+    mascot.classList.add('show');
+  } else {
+    mascot.classList.remove('show');
+  }
+}
+
+function hideMascot() {
+  document.getElementById('mascot').classList.remove('show');
 }
 
 function getFormTotal() {
