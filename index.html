@@ -734,7 +734,7 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
     <div class="chat-msg bot">嗨～我是點餐小幫手！有什麼菜單問題都可以問我 😊</div>
   </div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="問我菜單問題..." onkeydown="if(event.key==='Enter')sendChat()">
+    <input type="text" id="chatInput" placeholder="問我菜單問題..." onkeyup="if(event.key==='Enter'&&!event.isComposing)sendChat()">
     <button onclick="sendChat()">送出</button>
   </div>
 </div>
