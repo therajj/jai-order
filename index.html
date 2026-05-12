@@ -675,6 +675,12 @@ function populateSelects() {
     sel.appendChild(opt);
   });
 
+  const savedName = localStorage.getItem('jai_user');
+  if (savedName) {
+    sel.value = savedName;
+    loadOrder();
+  }
+
   populateOptions('selPasta', Object.keys(SAUCE_MAP));
   populateOptions('selCombo', COMBOS);
   populateOptions('selAddon', ADDONS);
@@ -723,6 +729,7 @@ function loadOrder() {
   const form = document.getElementById('orderForm');
   if (!name) { form.style.display = 'none'; return; }
   form.style.display = 'block';
+  localStorage.setItem('jai_user', name);
 
   const data = allOrders[name] || {};
 
