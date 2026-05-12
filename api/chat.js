@@ -2,9 +2,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: 'API key not configured' });
+  if (!ANTHROPIC_API_KEY) return res.status(500).json({ reply: 'API key 未設定，請到 Vercel 環境變數加入 ANTHROPIC_API_KEY' });
 
-  const { message } = req.body;
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  const message = body?.message;
+  if (!message) return res.status(400).json({ reply: '沒有收到訊息內容' });
 
   const systemPrompt = `你是 JAI 宅餐廳的訂餐小幫手，個性活潑可愛、有點搞笑，像一隻圓滾滾的吉祥物。用繁體中文回答，語氣輕鬆親切，適時加入表情符號。回答盡量簡短（2-3句以內）。
 
@@ -67,9 +69,14 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    if (data.error) {
+      return res.status(200).json({ reply: `API 錯誤：${data.error.message}` });
+    }
+
     const reply = data.content?.[0]?.text || '欸...我當機了，再問一次？';
     return res.status(200).json({ reply });
   } catch (e) {
-    return res.status(500).json({ reply: '連線出了問題，等等再試試 🥲' });
+    return res.status(500).json({ reply: `連線錯誤：${e.message}` });
   }
 }
