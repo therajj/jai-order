@@ -433,6 +433,7 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
       </select>
     </div>
 
+    <div class="loading-spinner" id="formLoading" style="display:none;">載入訂單中...</div>
     <div id="orderForm" style="display:none;">
       <div class="form-row">
         <div class="form-group">
@@ -659,6 +660,7 @@ async function fetchOrders() {
     const cache = localStorage.getItem('jai_orders_cache');
     if (cache) allOrders = JSON.parse(cache);
   }
+  dataReady = true;
   renderSummary();
   if (document.getElementById('selName').value) {
     loadOrder();
@@ -749,12 +751,22 @@ function toggleSummary() {
 
 
 // Form Logic
+let dataReady = false;
+
 function loadOrder() {
   const name = document.getElementById('selName').value;
   const form = document.getElementById('orderForm');
-  if (!name) { form.style.display = 'none'; return; }
-  form.style.display = 'block';
+  const loading = document.getElementById('formLoading');
+  if (!name) { form.style.display = 'none'; loading.style.display = 'none'; return; }
   localStorage.setItem('jai_user', name);
+
+  if (!dataReady) {
+    form.style.display = 'none';
+    loading.style.display = 'block';
+    return;
+  }
+  loading.style.display = 'none';
+  form.style.display = 'block';
 
   const data = allOrders[name] || {};
 
