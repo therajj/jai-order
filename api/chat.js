@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_API_KEY) return res.status(500).json({ reply: 'API key 未設定，請到 Vercel 環境變數加入 ANTHROPIC_API_KEY' });
+  const API_URL = process.env.AI_ENDPOINT_URL;
+  const API_KEY = process.env.AI_ENDPOINT_KEY;
+  if (!API_URL || !API_KEY) return res.status(500).json({ reply: 'AI Endpoint 未設定，請到 Vercel 加入 AI_ENDPOINT_URL 和 AI_ENDPOINT_KEY' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const message = body?.message;
@@ -53,28 +54,29 @@ export default async function handler(req, res) {
 如果有人問跟菜單無關的問題，可以幽默回應但引導回點餐話題。`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: process.env.AI_MODEL || 'gpt-4o',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
+        ],
         max_tokens: 300,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: message }],
       }),
     });
 
     const data = await response.json();
 
     if (data.error) {
-      return res.status(200).json({ reply: `API 錯誤：${data.error.message}` });
+      return res.status(200).json({ reply: `API 錯誤：${data.error.message || JSON.stringify(data.error)}` });
     }
 
-    const reply = data.content?.[0]?.text || '欸...我當機了，再問一次？';
+    const reply = data.choices?.[0]?.message?.content || '欸...我當機了，再問一次？';
     return res.status(200).json({ reply });
   } catch (e) {
     return res.status(500).json({ reply: `連線錯誤：${e.message}` });
