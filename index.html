@@ -181,48 +181,26 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
   gap: 12px;
 }
 
-.clam-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  margin-top: -8px;
-}
-
-.clam-text {
+.clam-tag {
+  padding: 6px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: white;
   font-size: 0.82rem;
   color: var(--text-light);
-  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.toggle-switch {
-  width: 44px;
-  height: 24px;
-  background: var(--border);
-  border-radius: 12px;
-  position: relative;
-  transition: background 0.2s;
-  flex-shrink: 0;
+.clam-tag:hover {
+  border-color: var(--green-mid);
+  color: var(--green-mid);
 }
 
-.toggle-switch.active {
+.clam-tag.active {
   background: var(--green-mid);
-}
-
-.toggle-knob {
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.toggle-switch.active .toggle-knob {
-  transform: translateX(20px);
+  color: white;
+  border-color: var(--green-mid);
 }
 
 .combo-rules {
@@ -537,11 +515,8 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
         </div>
       </div>
 
-      <div id="clamToggleWrap" class="clam-row" style="display:none;">
-        <span class="clam-text">蛤蜊增量 +$60</span>
-        <div class="toggle-switch" id="btnClam" onclick="toggleClam()">
-          <div class="toggle-knob"></div>
-        </div>
+      <div id="clamToggleWrap" style="display:none;margin-bottom:16px;margin-top:-8px;">
+        <button type="button" class="clam-tag" id="btnClam" onclick="toggleClam()">+ 蛤蜊增量 $60</button>
       </div>
 
       <div class="form-group">
@@ -863,9 +838,11 @@ function loadOrder() {
   if (data.clamExtra) {
     document.getElementById('chkClam').value = 'true';
     document.getElementById('btnClam').classList.add('active');
+    document.getElementById('btnClam').textContent = '✓ 蛤蜊增量 $60';
   } else {
     document.getElementById('chkClam').value = 'false';
     document.getElementById('btnClam').classList.remove('active');
+    document.getElementById('btnClam').textContent = '+ 蛤蜊增量 $60';
   }
 
   lookupPrice();
@@ -941,10 +918,12 @@ function updateClamUpgrade() {
 }
 
 function toggleClam() {
-  const toggle = document.getElementById('btnClam');
+  const btn = document.getElementById('btnClam');
   const input = document.getElementById('chkClam');
-  toggle.classList.toggle('active');
-  input.value = toggle.classList.contains('active') ? 'true' : 'false';
+  btn.classList.toggle('active');
+  const isActive = btn.classList.contains('active');
+  input.value = isActive ? 'true' : 'false';
+  btn.textContent = isActive ? '✓ 蛤蜊增量 $60' : '+ 蛤蜊增量 $60';
   calc();
 }
 
