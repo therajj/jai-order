@@ -94,7 +94,6 @@ export default async function handler(req, res) {
     const wantsImage = imageKeywords.some(kw => message.includes(kw));
 
     if (wantsImage && GOOGLE_API_KEY && GOOGLE_CX) {
-      // Extract food name from user message
       const foodItems = ['松露薯條','薯條','炸雞','青花椒脆皮炸雞','蜂蜜芥末炸雞','檸檬炸雞','提拉米蘇','布丁','玉米','橘醬','松露奶油','麻辣奶油','Cheese奶油','墨西哥奶油莎莎','佩里斯白醬','紐奧良雞腿','蛤蜊','烤雞腿','炸蝦','松阪豬','圓麵','扁麵','筆管麵','燉飯','拿鐵','美式','奶茶','烏龍茶','紅茶','水果茶','麵包','濃湯'];
       const matched = foodItems.find(item => message.includes(item)) || message.replace(/我想看|圖片|的|長怎樣|長什麼樣|照片/g, '').trim();
       const query = `JAI宅 ${matched}`;
@@ -106,8 +105,14 @@ export default async function handler(req, res) {
         const searchData = await searchRes.json();
         if (searchData.items?.[0]?.link) {
           imageUrl = searchData.items[0].link;
+        } else {
+          reply += `\n[debug: 搜尋無結果, query=${query}, error=${JSON.stringify(searchData.error || 'no items')}]`;
         }
-      } catch (e) {}
+      } catch (e) {
+        reply += `\n[debug: ${e.message}]`;
+      }
+    } else if (wantsImage) {
+      reply += `\n[debug: wantsImage=true, hasGoogleKey=${!!GOOGLE_API_KEY}, hasCX=${!!GOOGLE_CX}]`;
     }
 
     return res.status(200).json({ reply, imageUrl });
