@@ -654,7 +654,7 @@ async function saveToRemote(name, data) {
       body: JSON.stringify({ name, data }),
     });
   } catch (e) {
-    console.error('Save failed:', e);
+    showToast('⚠️ 同步失敗，請稍後重試');
   }
 }
 
