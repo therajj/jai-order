@@ -86,13 +86,18 @@ export default async function handler(req, res) {
     }
 
     let reply = data.choices?.[0]?.message?.content || '欸...我當機了，再問一次？';
+    reply = reply.replace(/\[IMG:.+?\]/g, '').trim();
     let imageUrl = null;
 
-    // Check for [IMG:query] tag
-    const imgMatch = reply.match(/\[IMG:(.+?)\]/);
-    if (imgMatch && GOOGLE_API_KEY && GOOGLE_CX) {
-      const query = imgMatch[1];
-      reply = reply.replace(/\[IMG:.+?\]/, '').trim();
+    // Detect if user wants to see an image
+    const imageKeywords = ['看', '圖片', '圖', '長怎樣', '長什麼樣', '照片', '外觀', '樣子'];
+    const wantsImage = imageKeywords.some(kw => message.includes(kw));
+
+    if (wantsImage && GOOGLE_API_KEY && GOOGLE_CX) {
+      // Extract food name from user message
+      const foodItems = ['松露薯條','薯條','炸雞','青花椒脆皮炸雞','蜂蜜芥末炸雞','檸檬炸雞','提拉米蘇','布丁','玉米','橘醬','松露奶油','麻辣奶油','Cheese奶油','墨西哥奶油莎莎','佩里斯白醬','紐奧良雞腿','蛤蜊','烤雞腿','炸蝦','松阪豬','圓麵','扁麵','筆管麵','燉飯','拿鐵','美式','奶茶','烏龍茶','紅茶','水果茶','麵包','濃湯'];
+      const matched = foodItems.find(item => message.includes(item)) || message.replace(/我想看|圖片|的|長怎樣|長什麼樣|照片/g, '').trim();
+      const query = `JAI宅 ${matched}`;
 
       try {
         const searchRes = await fetch(
@@ -103,8 +108,6 @@ export default async function handler(req, res) {
           imageUrl = searchData.items[0].link;
         }
       } catch (e) {}
-    } else if (imgMatch) {
-      reply = reply.replace(/\[IMG:.+?\]/, '').trim();
     }
 
     return res.status(200).json({ reply, imageUrl });
