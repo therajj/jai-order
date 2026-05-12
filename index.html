@@ -1302,10 +1302,13 @@ async function sendChat() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg) return;
-  input.value = '';
 
   const messages = document.getElementById('chatMessages');
-  messages.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = msg;
+  messages.appendChild(userMsg);
+  input.value = '';
 
   const typing = document.createElement('div');
   typing.className = 'chat-msg typing';
