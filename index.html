@@ -772,7 +772,8 @@ function loadOrder() {
   document.getElementById('selCombo').value = data.combo || '';
   showComboRules();
   document.getElementById('selAddon').value = data.addon || '';
-  document.getElementById('selExtra').value = data.extra || '';
+  const extraVal = data.extra || '';
+  document.getElementById('selExtra').value = (extraVal === '加麵' || extraVal === '加飯') ? '加大' : extraVal;
   document.getElementById('selSides').value = data.sides || '';
   document.getElementById('selDrinks').value = data.drinks || '';
   updateIceHot();
