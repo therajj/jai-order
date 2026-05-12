@@ -1324,10 +1324,22 @@ async function sendChat() {
     });
     const data = await res.json();
     typing.remove();
-    messages.innerHTML += `<div class="chat-msg bot">${data.reply}</div>`;
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    botMsg.textContent = data.reply;
+    messages.appendChild(botMsg);
+    if (data.imageUrl) {
+      const imgMsg = document.createElement('div');
+      imgMsg.className = 'chat-msg bot';
+      imgMsg.innerHTML = `<img src="${data.imageUrl}" alt="food" style="width:100%;border-radius:8px;margin-top:4px;">`;
+      messages.appendChild(imgMsg);
+    }
   } catch (e) {
     typing.remove();
-    messages.innerHTML += `<div class="chat-msg bot">連線出了問題，等等再試 🥲</div>`;
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg bot';
+    errMsg.textContent = '連線出了問題，等等再試 🥲';
+    messages.appendChild(errMsg);
   }
   messages.scrollTop = messages.scrollHeight;
 }
