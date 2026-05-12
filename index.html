@@ -1001,7 +1001,9 @@ function renderSummary() {
   });
   const gtEl = document.getElementById('grandTotal');
   if (orderCount > 0) {
-    gtEl.innerHTML = `<span>合計（${orderCount} 人已點）</span><span>$${grandTotal}</span>`;
+    const budgetTotal = orderCount * BUDGET;
+    const indicator = grandTotal <= budgetTotal ? '🟢' : '🔴';
+    gtEl.innerHTML = `<span>合計（${orderCount} 人已點）</span><span>${indicator} $${grandTotal}</span>`;
     gtEl.style.display = 'flex';
   } else {
     gtEl.style.display = 'none';
