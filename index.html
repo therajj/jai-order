@@ -41,9 +41,22 @@ header h1 { font-size: 2rem; font-weight: 300; letter-spacing: 4px; margin-botto
 header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
 
 .container {
-  max-width: 560px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.col-left, .col-right {
+  min-width: 0;
+}
+
+.col-right {
+  position: sticky;
+  top: 24px;
 }
 
 /* Menu Toggle */
@@ -74,7 +87,7 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
   margin-bottom: 20px;
   margin-top: -12px;
   box-shadow: var(--shadow);
-  max-height: 60vh;
+  max-height: 70vh;
   overflow-y: auto;
 }
 
@@ -246,7 +259,8 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
 /* Team Summary */
 .summary-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
   gap: 10px;
 }
 
@@ -258,6 +272,7 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s;
+  min-height: 48px;
 }
 
 .summary-item .name {
@@ -435,8 +450,128 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
   vertical-align: middle;
 }
 
-@media (max-width: 480px) {
-  .container { padding: 16px 12px; }
+/* Borrow Budget */
+.borrow-section {
+  display: none;
+  margin-top: 12px;
+  padding: 16px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+}
+
+.borrow-section.show { display: block; }
+
+.borrow-section h4 {
+  font-size: 0.85rem;
+  color: #e65100;
+  margin-bottom: 4px;
+}
+
+.borrow-section .borrow-hint {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.borrow-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.borrow-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: white;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.borrow-item:hover { border-color: var(--green-mid); }
+
+.borrow-item.selected {
+  background: var(--green-mid);
+  color: white;
+  border-color: var(--green-mid);
+}
+
+.borrow-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.borrow-item .avail {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.borrow-result {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.6;
+  display: none;
+}
+
+.borrow-result.show { display: block; }
+
+.summary-borrow {
+  font-size: 0.72rem;
+  color: #e65100;
+  margin-top: 2px;
+}
+
+.summary-item { cursor: pointer; position: relative; }
+.summary-item.empty { cursor: default; }
+
+.summary-detail {
+  display: none;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  box-shadow: var(--shadow);
+}
+
+.summary-detail.show { display: block; }
+
+.summary-detail .detail-title {
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.summary-detail .detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.summary-detail .detail-row .label { color: var(--text-light); }
+.summary-detail .detail-row .value { font-weight: 500; }
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    max-width: 560px;
+  }
+  .col-right {
+    position: static;
+  }
   .form-row { grid-template-columns: 1fr; }
   .summary-grid { grid-template-columns: 1fr; }
   .card { padding: 18px; }
@@ -452,28 +587,8 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
 
 <div class="container">
 
-  <!-- Menu Reference -->
-  <div class="menu-toggle" onclick="toggleMenu()">
-    <h2>完整菜單</h2>
-    <span class="arrow">&#9662;</span>
-  </div>
-  <div class="menu-panel" id="menuPanel"></div>
-
-  <!-- Team Summary -->
-  <div class="menu-toggle" onclick="toggleSummary()">
-    <h2>團隊訂餐總覽 <span style="font-size:0.75rem;font-weight:400;color:var(--text-light);margin-left:8px;">預算上限 $650/人</span></h2>
-    <span class="arrow" id="summaryArrow">&#9662;</span>
-  </div>
-  <div class="summary-panel" id="summaryPanel">
-    <div class="summary-grid" id="summaryGrid"><div class="loading-spinner" id="loadingSpinner">載入中...</div></div>
-    <div class="grand-total" id="grandTotal" style="display:none;"></div>
-    <div class="actions">
-      <button class="btn-action" onclick="exportText()">複製訂單文字</button>
-      <button class="btn-action" onclick="exportCSV()">下載 CSV</button>
-    </div>
-  </div>
-
-  <!-- Order Form -->
+  <!-- Left Column: Order Form -->
+  <div class="col-left">
   <div class="card">
     <h2 class="card-title">點餐</h2>
 
@@ -574,7 +689,7 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
         </div>
         <div class="form-group">
           <label>備註</label>
-          <input type="text" id="inpNote" placeholder="壽星 / 其他" list="noteList">
+          <input type="text" id="inpNote" placeholder="壽星 / 其他" list="noteList" onchange="calc()" oninput="calc()">
         </div>
       </div>
 
@@ -582,9 +697,43 @@ header p { font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px; }
         <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px;">含 10% 服務費</div>
         <div>小計：<span id="subtotal">$0</span></div>
       </div>
+
+      <div class="borrow-section" id="borrowSection">
+        <h4>超出預算 — 借用同事額度</h4>
+        <div class="borrow-hint">選擇要借用誰的剩餘預算（可多選，依序分配）</div>
+        <div class="borrow-list" id="borrowList"></div>
+        <div class="borrow-result" id="borrowResult"></div>
+      </div>
+
       <button class="btn-save" onclick="saveOrder()">儲存訂單</button>
     </div>
   </div>
+  </div><!-- /col-left -->
+
+  <!-- Right Column: Summary + Menu -->
+  <div class="col-right">
+    <!-- Team Summary -->
+    <div class="menu-toggle" id="summaryToggleBtn" onclick="toggleSummary()">
+      <h2>團隊訂餐總覽 <span style="font-size:0.75rem;font-weight:400;color:var(--text-light);margin-left:8px;">預算上限 $650/人</span></h2>
+      <span class="arrow" id="summaryArrow">&#9662;</span>
+    </div>
+    <div class="summary-panel" id="summaryPanel">
+      <div class="summary-grid" id="summaryGrid"><div class="loading-spinner" id="loadingSpinner">載入中...</div></div>
+      <div class="summary-detail" id="summaryDetail"></div>
+      <div class="grand-total" id="grandTotal" style="display:none;"></div>
+      <div class="actions">
+        <button class="btn-action" onclick="exportText()">複製訂單文字</button>
+        <button class="btn-action" onclick="exportCSV()">下載 CSV</button>
+      </div>
+    </div>
+
+    <!-- Menu Reference -->
+    <div class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()" style="margin-top:20px;">
+      <h2>完整菜單</h2>
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="menu-panel" id="menuPanel"></div>
+  </div><!-- /col-right -->
 
 </div>
 
@@ -799,14 +948,42 @@ function buildMenuPanel() {
   panel.innerHTML = html;
 }
 
+let openDetail = '';
+function toggleDetail(name) {
+  const panel = document.getElementById('summaryDetail');
+  if (openDetail === name) {
+    panel.classList.remove('show');
+    openDetail = '';
+    return;
+  }
+  openDetail = name;
+  const data = allOrders[name];
+  if (!data) { panel.classList.remove('show'); return; }
+
+  let html = `<div class="detail-title">${name} 的訂單</div>`;
+  if (data.pasta) html += `<div class="detail-row"><span class="label">主餐</span><span class="value">${data.pasta} / ${data.sauce} / ${data.ingredient}</span></div>`;
+  if (data.combo) html += `<div class="detail-row"><span class="label">套餐</span><span class="value">${data.combo.split(' $')[0]}</span></div>`;
+  if (data.addon) html += `<div class="detail-row"><span class="label">加購</span><span class="value">${data.addon.split(' $')[0]}</span></div>`;
+  if (data.extra) html += `<div class="detail-row"><span class="label">加大</span><span class="value">${data.extra}</span></div>`;
+  if (data.clamExtra) html += `<div class="detail-row"><span class="label">蛤蜊增量</span><span class="value">+$60</span></div>`;
+  if (data.sides) html += `<div class="detail-row"><span class="label">小物</span><span class="value">${data.sides.split(' $')[0]}</span></div>`;
+  if (data.drinks) html += `<div class="detail-row"><span class="label">飲品</span><span class="value">${data.drinks.split(' $')[0]}${data.temp ? ' ('+data.temp+')' : ''}</span></div>`;
+  if (data.dessert) html += `<div class="detail-row"><span class="label">甜點</span><span class="value">${data.dessert.split(' $')[0]}</span></div>`;
+  if (data.note) html += `<div class="detail-row"><span class="label">備註</span><span class="value">${data.note}</span></div>`;
+  html += `<div class="detail-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px;"><span class="label" style="font-weight:600;">小計</span><span class="value" style="color:var(--green-dark);">$${data.total}</span></div>`;
+
+  panel.innerHTML = html;
+  panel.classList.add('show');
+}
+
 function toggleMenu() {
   document.getElementById('menuPanel').classList.toggle('show');
-  document.querySelectorAll('.menu-toggle')[0].classList.toggle('open');
+  document.getElementById('menuToggleBtn').classList.toggle('open');
 }
 
 function toggleSummary() {
   document.getElementById('summaryPanel').classList.toggle('show');
-  document.querySelectorAll('.menu-toggle')[1].classList.toggle('open');
+  document.getElementById('summaryToggleBtn').classList.toggle('open');
 }
 
 
@@ -858,6 +1035,9 @@ function loadOrder() {
   document.getElementById('selTemp').value = data.temp || '';
   document.getElementById('selDessert').value = data.dessert || '';
   document.getElementById('inpNote').value = data.note || '';
+
+  // Restore borrow selections
+  borrowSelections = (data.borrowFrom || []).map(b => b.name);
   calc();
 }
 
@@ -981,7 +1161,11 @@ function calcTotal() {
     }
   }
 
-  const subtotal = price + combo + addon + clamExtra + sides + drinks + dessert - drinkDeduct - sideDeduct;
+  // 壽星免費甜點
+  const note = document.getElementById('inpNote').value;
+  const birthdayDeduct = (note === '壽星' && dessert > 0) ? dessert : 0;
+
+  const subtotal = price + combo + addon + clamExtra + sides + drinks + dessert - drinkDeduct - sideDeduct - birthdayDeduct;
   const serviceCharge = Math.round(subtotal * 0.1);
   return subtotal + serviceCharge;
 }
@@ -989,8 +1173,11 @@ function calcTotal() {
 function calc() {
   const total = calcTotal();
   document.getElementById('subtotal').textContent = `$${total}`;
+  updateBorrowSection();
   const mascot = document.getElementById('mascot');
-  if (total > BUDGET) {
+  const borrowed = getBorrowFromData().reduce((s, b) => s + b.amount, 0);
+  const excess = total - BUDGET;
+  if (total > BUDGET && borrowed < excess) {
     mascot.classList.add('show');
   } else {
     mascot.classList.remove('show');
@@ -999,6 +1186,138 @@ function calc() {
 
 function hideMascot() {
   document.getElementById('mascot').classList.remove('show');
+}
+
+// === Borrow Budget ===
+let borrowSelections = []; // ordered list of names selected to borrow from
+
+function getAmountLentOut(lenderName, excludeBorrower) {
+  let lent = 0;
+  Object.entries(allOrders).forEach(([name, data]) => {
+    if (name === excludeBorrower) return;
+    if (data.borrowFrom && Array.isArray(data.borrowFrom)) {
+      data.borrowFrom.forEach(b => {
+        if (b.name === lenderName) lent += b.amount;
+      });
+    }
+  });
+  return lent;
+}
+
+function getAvailableBudget(lenderName, borrowerName) {
+  const data = allOrders[lenderName];
+  const theirTotal = data ? (data.total || 0) : 0;
+  const lentOut = getAmountLentOut(lenderName, borrowerName);
+  return Math.max(0, BUDGET - theirTotal - lentOut);
+}
+
+function updateBorrowSection() {
+  const section = document.getElementById('borrowSection');
+  const list = document.getElementById('borrowList');
+  const result = document.getElementById('borrowResult');
+  const total = calcTotal();
+  const currentName = document.getElementById('selName').value;
+
+  if (total <= BUDGET || !currentName) {
+    section.classList.remove('show');
+    borrowSelections = [];
+    result.classList.remove('show');
+    return;
+  }
+
+  section.classList.add('show');
+  const excess = total - BUDGET;
+
+  // Remove stale selections where the lender no longer has available budget
+  borrowSelections = borrowSelections.filter(n => getAvailableBudget(n, currentName) > 0);
+
+  // Check if already fully covered
+  let coveredAmount = 0;
+  borrowSelections.forEach(name => {
+    const avail = getAvailableBudget(name, currentName);
+    coveredAmount += Math.min(avail, Math.max(0, excess - coveredAmount));
+  });
+  const fullyCovered = coveredAmount >= excess && borrowSelections.length > 0;
+
+  let html = '';
+  NAMES.forEach(name => {
+    if (name === currentName) return;
+    const data = allOrders[name];
+    if (!data || !data.total) return;
+    const avail = getAvailableBudget(name, currentName);
+    if (avail <= 0) return;
+    const selected = borrowSelections.includes(name);
+    const disabled = fullyCovered && !selected;
+    html += `<div class="borrow-item ${selected ? 'selected' : ''}${disabled ? ' disabled' : ''}" ${disabled ? '' : `onclick="toggleBorrow('${name}')"`}>
+      <span>${name}</span>
+      <span class="avail">$${avail}</span>
+    </div>`;
+  });
+
+  if (!html) {
+    html = '<div style="font-size:0.82rem;color:var(--text-light);">目前沒有同事有剩餘額度</div>';
+  }
+  list.innerHTML = html;
+
+  // Calculate distribution
+  if (borrowSelections.length > 0) {
+    let remaining = excess;
+    let distributions = [];
+    borrowSelections.forEach(name => {
+      if (remaining <= 0) return;
+      const avail = getAvailableBudget(name, currentName);
+      const amount = Math.min(avail, remaining);
+      if (amount > 0) {
+        distributions.push({ name, amount });
+        remaining -= amount;
+      }
+    });
+
+    if (distributions.length > 0) {
+      let rhtml = distributions.map(d => `<div>${d.name} 借 $${d.amount}</div>`).join('');
+      if (remaining > 0) {
+        rhtml += `<div style="color:var(--red);margin-top:4px;">尚不足 $${remaining}</div>`;
+      } else {
+        rhtml += `<div style="color:var(--green-mid);margin-top:4px;">已完全 cover</div>`;
+      }
+      result.innerHTML = rhtml;
+      result.classList.add('show');
+    } else {
+      result.classList.remove('show');
+    }
+  } else {
+    result.classList.remove('show');
+  }
+}
+
+function toggleBorrow(name) {
+  const idx = borrowSelections.indexOf(name);
+  if (idx >= 0) {
+    borrowSelections.splice(idx, 1);
+  } else {
+    borrowSelections.push(name);
+  }
+  updateBorrowSection();
+}
+
+function getBorrowFromData() {
+  const total = calcTotal();
+  const currentName = document.getElementById('selName').value;
+  if (total <= BUDGET || borrowSelections.length === 0) return [];
+
+  const excess = total - BUDGET;
+  let remaining = excess;
+  let distributions = [];
+  borrowSelections.forEach(name => {
+    if (remaining <= 0) return;
+    const avail = getAvailableBudget(name, currentName);
+    const amount = Math.min(avail, remaining);
+    if (amount > 0) {
+      distributions.push({ name, amount });
+      remaining -= amount;
+    }
+  });
+  return distributions;
 }
 
 function getFormTotal() {
@@ -1026,6 +1345,7 @@ function saveOrder() {
     dessert: document.getElementById('selDessert').value,
     note: document.getElementById('inpNote').value,
     total: getFormTotal(),
+    borrowFrom: getBorrowFromData(),
   };
 
   // Update UI immediately (optimistic)
@@ -1044,7 +1364,7 @@ function saveOrder() {
   // Save to remote in background (non-blocking)
   fetch(API_URL, {
     method: 'POST',
-    redirect: 'follow',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, data }),
   }).catch(e => console.error('Remote save failed:', e));
 }
@@ -1055,27 +1375,75 @@ function renderSummary() {
   const orders = getOrders();
   let html = '';
 
+  // Build lent-out map: { lenderName: [{ borrower, amount }] }
+  const lentMap = {};
+  NAMES.forEach(name => {
+    const data = orders[name];
+    if (data && data.borrowFrom && Array.isArray(data.borrowFrom)) {
+      data.borrowFrom.forEach(b => {
+        if (!lentMap[b.name]) lentMap[b.name] = [];
+        lentMap[b.name].push({ borrower: name, amount: b.amount });
+      });
+    }
+  });
+
   NAMES.forEach(name => {
     const data = orders[name];
     const total = data ? (data.total || 0) : 0;
+    const rawBorrowInfo = data && data.borrowFrom && data.borrowFrom.length > 0 ? data.borrowFrom : [];
+
+    // Validate borrows: cap each entry by what the lender can actually provide now
+    const borrowInfo = rawBorrowInfo.map(b => {
+      const maxLend = getAvailableBudget(b.name, name);
+      return { name: b.name, amount: Math.min(b.amount, maxLend) };
+    }).filter(b => b.amount > 0);
+
+    // Validate lent-out: only count amounts where this person can actually lend
+    const rawLent = lentMap[name] || [];
+    const validLent = rawLent.map(l => {
+      const maxLend = getAvailableBudget(name, l.borrower);
+      return { borrower: l.borrower, amount: Math.min(l.amount, maxLend) };
+    }).filter(l => l.amount > 0);
+    const lentOut = validLent.reduce((s, l) => s + l.amount, 0);
+
+    let borrowHtml = '';
+    if (borrowInfo.length > 0) {
+      borrowHtml = `<div class="summary-borrow">借用：${borrowInfo.map(b => `${b.name} $${b.amount}`).join('、')}</div>`;
+    }
+    if (validLent.length > 0) {
+      borrowHtml += `<div class="summary-borrow">被借：${validLent.map(l => `${l.borrower} $${l.amount}`).join('、')}</div>`;
+    }
+
+    const clickAttr = (data && total > 0) ? `onclick="toggleDetail('${name}')"` : '';
 
     if (!data || total === 0) {
       html += `<div class="summary-item empty">
-        <span class="name">${name}</span>
+        <span class="name">${name}${borrowHtml}</span>
         <span class="status">未點餐</span>
       </div>`;
     } else if (total > BUDGET) {
-      html += `<div class="summary-item over-budget">
-        <span class="name">${name}</span>
-        <span class="status">🔴</span>
-      </div>`;
+      const borrowed = borrowInfo.reduce((s, b) => s + b.amount, 0);
+      const excess = total - BUDGET;
+      if (borrowed >= excess) {
+        html += `<div class="summary-item" ${clickAttr}>
+          <span class="name">${name}${borrowHtml}</span>
+          <span class="status">借用 $${borrowed} ✓</span>
+        </div>`;
+      } else {
+        html += `<div class="summary-item over-budget" ${clickAttr}>
+          <span class="name">${name}${borrowHtml}</span>
+          <span class="status">🔴</span>
+        </div>`;
+      }
     } else {
-      const remaining = BUDGET - total;
-      html += `<div class="summary-item">
-        <span class="name">${name}</span>
-        <span class="status">剩餘 $${remaining}</span>
+      const effectiveRemaining = BUDGET - total - lentOut;
+      let statusText = effectiveRemaining >= 0 ? `剩餘 $${effectiveRemaining}` : `被借超額`;
+      html += `<div class="summary-item${effectiveRemaining < 0 ? ' over-budget' : ''}" ${clickAttr}>
+        <span class="name">${name}${borrowHtml}</span>
+        <span class="status">${statusText}</span>
       </div>`;
     }
+
   });
 
   grid.innerHTML = html;

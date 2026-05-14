@@ -31,6 +31,7 @@ function doGet(e) {
       note: row[13] || '',
       total: row[14] || 0,
       timestamp: row[15] || '',
+      borrowFrom: row[16] ? JSON.parse(row[16]) : [],
     };
   }
 
@@ -70,6 +71,7 @@ function doPost(e) {
     data.note || '',
     data.total || 0,
     new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+    JSON.stringify(data.borrowFrom || []),
   ];
 
   if (rowIndex > 0) {
@@ -88,7 +90,7 @@ function getOrCreateSheet() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(['姓名','麵體','醬料','主食材','主餐價格','套餐','加購','免費加量','小物','飲品','冰熱','甜點','蛤蜊增量','備註','小計','時間']);
+    sheet.appendRow(['姓名','麵體','醬料','主食材','主餐價格','套餐','加購','免費加量','小物','飲品','冰熱','甜點','蛤蜊增量','備註','小計','時間','借用預算']);
   }
   return sheet;
 }
@@ -107,5 +109,5 @@ function initSheet() {
     sheet = ss.insertSheet(SHEET_NAME);
   }
   sheet.clear();
-  sheet.appendRow(['姓名','麵體','醬料','主食材','主餐價格','套餐','加購','免費加量','小物','飲品','冰熱','甜點','蛤蜊增量','備註','小計','時間']);
+  sheet.appendRow(['姓名','麵體','醬料','主食材','主餐價格','套餐','加購','免費加量','小物','飲品','冰熱','甜點','蛤蜊增量','備註','小計','時間','借用預算']);
 }
